@@ -478,8 +478,8 @@ int execute_line(char *line)
     strcpy(copyLine, line);
 
     char *args[COMMAND_LINE_SIZE];
-    int foreground = is_background(args);
     int exParse = parse_args(args, line);
+    int foreground = is_background(args);
     // Si no hay argumentos, devolvemos 0
     if (exParse == 0)
     {
@@ -734,15 +734,15 @@ void ctrlz(int signum){
     signal(SIGTSTP, ctrlz);
     //Mensaje para imprimir el proceso que ha sido detenido con write
     char mensaje[COMMAND_LINE_SIZE+256];
+    
     if(jobs_list[0].pid > 0)
     {
         //Si el proceso en foreground no es el shell, lo detenemos
         if(strcmp(jobs_list[0].comando, mi_shell)!=0)
         {
-            kill(jobs_list[0].pid, SIGTSTP);
-            sprintf(mensaje,"\nProceso detenido y pasado a background: PID %d, comando: %s\n", jobs_list[n_jobs].pid, jobs_list[n_jobs].comando);
-            write(2, mensaje, strlen(mensaje));
-            fflush(stdout);
+            kill(jobs_list[0].pid, SIGSTOP);
+            write(1, "\n", 1);
+            fflush (stdout);
             //Añadimos el proceso detenido a la lista de trabajos
             jobs_list_add(jobs_list[0].pid, jobs_list[0].comando, 'D');
             //Limpiamos el proceso en foreground
@@ -752,6 +752,10 @@ void ctrlz(int signum){
             {
                 jobs_list[0].comando[i] = '\0';
             }
+            sprintf(mensaje,"Proceso detenido y pasado a background: PID %d, comando: %s\n", jobs_list[0].pid, jobs_list[0].comando);
+            write(2, mensaje, strlen(mensaje));
+            fflush(stdout);
+            
         }
         //Si el proceso en foreground es el shell, no hacemos nada y mostramos un mensaje
         else
@@ -800,3 +804,4 @@ void main(int argc, char *argv[])
         }
     }
 }
+
