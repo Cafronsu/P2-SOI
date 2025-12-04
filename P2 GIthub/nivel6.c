@@ -220,16 +220,9 @@ int internal_export(char **args)
     }
 
     // Separamos el argumento en variable y valor y comprobamos que no sean nulos
+    char *var = args[1];
+    char *value = strchr(args[1], '=');
 
-    char *var = strtok(args[1], "=");
-    char *value = strtok(NULL, "=");
-
-    #if DEBUGN2
-        sprintf(mensaje, "Comprobación antes de export: %s\nValor: %s\nVariable: %s\n", getenv(var), value, var);
-        write(2,mensaje, strlen(mensaje));
-        fflush(stdout);
-    #endif
-    
     if (value == NULL)
     {
         sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. export: el valor es nulo\n" RESET);
@@ -237,6 +230,16 @@ int internal_export(char **args)
         fflush(stdout);
         return -1;
     }
+
+    
+    *value = '\0';    // cortamos la cadena en el primer '='
+    value++;          // ahora value apunta a todo lo que viene después del primer igual
+
+    #if DEBUGN2
+        sprintf(mensaje, "Comprobación antes de export: %s\nValor: %s\nVariable: %s\n", getenv(var), value, var);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
+    #endif
 
     // Establecemos la variable de entorno
     int k = setenv(var, value, 1);
