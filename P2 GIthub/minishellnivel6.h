@@ -34,12 +34,12 @@
 #define BLANCO "\033[37m"
 
 //Constantes de debug
-#define DEBUGN1 0;
-#define DEBUGN2 0;
-#define DEBUGN3 0;
-#define DEBUGN4 0;
-#define DEBUGN5 0;
-#define DEBUGN6 0;
+#define DEBUGN1 0
+#define DEBUGN2 0
+#define DEBUGN3 0
+#define DEBUGN4 0
+#define DEBUGN5 0
+#define DEBUGN6 1
 
 struct info_job
 {
@@ -79,4 +79,4 @@ int jobs_list_add(pid_t pid, char *comando, char estado);
 int jobs_list_find(pid_t pid);
 int jobs_list_remove(pid_t pid);
 int is_output_redirection(char **args);
-void main(int argc, char *argv[]);
+int main(int argc, char *argv[]);
