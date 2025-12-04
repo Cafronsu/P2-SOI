@@ -718,7 +718,7 @@ void reaper(int signum)
                 fflush(stdout);
                 #endif
             }
-            else if (WIFSIGNALED(status) && DEBUGN4)
+            else if (WIFSIGNALED(status))
             {
                 #if DEBUGN4||DEBUGN5||DEBUGN6
                 sprintf(mensaje,
