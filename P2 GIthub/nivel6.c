@@ -309,9 +309,11 @@ int internal_source(char **args)
         char *saltoLinea = strchr(buffer, '\n');
         fflush(exFopen);
         *saltoLinea = '\0';
+        #if DEBUGN3
         sprintf(mensaje, "\nComando: " SUBRAYADO "%s\n" RESET, buffer);
         write(2,mensaje, strlen(mensaje));
         fflush(stdout);
+        #endif
         execute_line(buffer);
     }
 
