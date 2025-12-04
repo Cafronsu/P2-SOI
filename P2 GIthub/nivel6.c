@@ -60,20 +60,23 @@ void internal_exit(int key)
 
     if (key == 0)
     {
-        printf("\nSaliendo con Ctrl+D");
 
+        sprintf(mensaje,"\nSaliendo con Ctrl+D");
+        write(2, mensaje, strlen(mensaje));
         fflush(stdout);
         sleep(1);
-        printf("\nTe echaremos de menos \U0001F972\n" RESET);
+        sprintf(mensaje,"\nTe echaremos de menos \U0001F972\n" RESET);
+        write(2, mensaje, strlen(mensaje));
         fflush(stdout);
     }
     else
     {
-        printf("Saliendo con exit");
-
+        sprintf(mensaje,"Saliendo con exit");
+        write(2, mensaje, strlen(mensaje));
         fflush(stdout);
         sleep(1);
-        printf("\nTe echaremos de menos \U0001F972\n" RESET);
+        sprintf(mensaje,"\nTe echaremos de menos \U0001F972\n" RESET);
+        write(2, mensaje, strlen(mensaje));
         fflush(stdout);
     }
     // Salimos del programa
@@ -100,7 +103,11 @@ int internal_cd(char **args)
                 perror(ROJO NEGRITA "Error. cd: Error al cambiar de directorio");
                 return -1;
             }
-            // printf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+            #if DEBUGN2
+                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                write(2,mensaje, strlen(mensaje));
+                fflush(stdout);
+            #endif
             return 1;
         }
         return -1;
@@ -122,7 +129,11 @@ int internal_cd(char **args)
                 perror(ROJO NEGRITA "Error. cd: Error al cambiar de directorio");
                 return -1;
             }
-            // printf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+            #if DEBUGN2
+                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                write(2,mensaje, strlen(mensaje));
+                fflush(stdout);
+            #endif
             return 1;
         } // Si no, cambiamos al directorio indicado
         else
@@ -133,16 +144,18 @@ int internal_cd(char **args)
                 perror(ROJO NEGRITA "Error. cd: Error al cambiar de directorio");
                 return -1;
             }
-            // printf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+            #if DEBUGN2
+                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                write(2,mensaje, strlen(mensaje));
+                fflush(stdout);
+            #endif
             return 1;
         }
 
-        // Si hay varios argumentos, comprobamos que todos son parte de la ruta
-    }
+    }        // Si hay varios argumentos, comprobamos que todos son parte de una ruta correcta
     else
     {
         // Reservamos memoria para el string temporal donde construiremos la ruta con carácteres a eliminar como ", ' o '\' y otro para la ruta limpia
-
         char *concat = (char *)malloc(COMMAND_LINE_SIZE * sizeof(char));
         char *temp = (char *)malloc(COMMAND_LINE_SIZE * sizeof(char));
         if (temp == NULL || concat == NULL)
@@ -173,7 +186,11 @@ int internal_cd(char **args)
         }
         free(concat);
         free(temp);
-        // printf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+        #if DEBUGN2
+                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                write(2,mensaje, strlen(mensaje));
+                fflush(stdout);
+        #endif
         return 1;
     }
 }
@@ -188,30 +205,35 @@ int internal_export(char **args)
     // Comprobamos que haya un argumento
     if (args[1] == NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. export: se requiere un argumento (NOMBRE==VALOR)\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. export: se requiere un argumento (NOMBRE==VALOR)\n" RESET);
+        write(2, mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
     // Si hay más de uno, error
     if (args[2] != NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. export: demasiados argumentos\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. export: demasiados argumentos\n" RESET);
+        write(2, mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
     // Separamos el argumento en variable y valor y comprobamos que no sean nulos
 
     char *var = strtok(args[1], "=");
-    // char *check = getenv(var);
-
-    // printf("Comprobación antes de export: %s\n", check);
     char *value = strtok(NULL, "=");
 
-    // printf("Variable: %s\n", var);
-    // printf("Valor: %s\n", value);
-
+    #if DEBUGN2
+        sprintf(mensaje, "Comprobación antes de export: %s\nValor: %s\nVariable: %s\n", getenv(var));
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
+    #endif
     if (value == NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. export: el valor es nulo\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. export: el valor es nulo\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
@@ -223,8 +245,11 @@ int internal_export(char **args)
         return -1;
     }
 
-    // check = getenv(var);
-    // printf("Comprobación después de export: %s\n", check);
+    #if DEBUGN2
+        sprintf(mensaje, "Valor: %s\n", value);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
+    #endif
     return 1;
 }
 
@@ -238,7 +263,9 @@ int internal_source(char **args)
     // Comprobamos que haya un argumento y, si no, indicamos la sintaxis correcta
     if (args[1] == NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. source: source <nombre_fichero>\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. source: source <nombre_fichero>\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
@@ -281,7 +308,8 @@ int internal_source(char **args)
         char *saltoLinea = strchr(buffer, '\n');
         fflush(exFopen);
         *saltoLinea = '\0';
-        printf("\nComando: " SUBRAYADO "%s\n" RESET, buffer);
+        sprintf(mensaje, "\nComando: " SUBRAYADO "%s\n" RESET, buffer);
+        write(2,mensaje, strlen(mensaje));
         fflush(stdout);
         execute_line(buffer);
     }
@@ -320,13 +348,17 @@ int internal_fg(char **args)
     // Comprobamos la sintaxis del comando
     if (args[1] == NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. fg: se requiere un argumento (fg valor)\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. fg: se requiere un argumento (fg valor)\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
     if (args[2] != NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. fg: demasiados argumentos\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. fg: demasiados argumentos\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
@@ -336,12 +368,15 @@ int internal_fg(char **args)
     //Si no es una posición válida, error
     if (pos > n_jobs || pos <= 0)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. fg: posición del trabajo no válida\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. fg: posición del trabajo no válida\n" RESET);
+        write(2, mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
     // Pasamos el trabajo a foreground
     jobs_list[0].pid = jobs_list[pos].pid;
+    //De esta manera, todos los procesos pasarán a tener estado E, tuvieran D o no.
     jobs_list[0].estado = 'E';
     strcpy(jobs_list[0].comando, jobs_list[pos].comando);
 
@@ -351,17 +386,11 @@ int internal_fg(char **args)
     {
         jobs_list[0].comando[len - 1] = '\0';
     }
-    //Si está detenido lo reanudamos
-    if (jobs_list[pos].estado == 'D')
-    {
-        sprintf(mensaje, "Reanudando proceso detenido: PID %d, comando: %s\n", jobs_list[pos].pid, jobs_list[pos].comando);
-        write(1, mensaje, strlen(mensaje));
-        fflush(stdout);
-    }
+    
     // Lo eliminamos de la lista de trabajos
-    jobs_list_remove(jobs_list[pos].pid);    
-    sprintf(mensaje, "Proceso pasado a foreground: PID %d, comando: %s\n", jobs_list[0].pid, jobs_list[0].comando);
-    write(1, mensaje, strlen(mensaje));
+    jobs_list_remove(jobs_list[pos].pid);
+    sprintf(mensaje, "PID %d, comando: %s\n", jobs_list[0].pid, jobs_list[0].comando);
+    write(2, mensaje, strlen(mensaje));
     fflush(stdout);
     //Reanudamos el proceso
     kill(jobs_list[0].pid, SIGCONT);
@@ -383,13 +412,17 @@ int internal_bg(char **args)
     // Comprobamos la sintaxis del comando
     if (args[1] == NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. bg: se requiere un argumento (bg valor)\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. bg: se requiere un argumento (bg valor)\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
     if (args[2] != NULL)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. bg: demasiados argumentos\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. bg: demasiados argumentos\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
     //Obtenemos la posición del trabajo
@@ -398,20 +431,24 @@ int internal_bg(char **args)
     //Si no es una posición válida, error
     if (pos > n_jobs || pos <= 0)
     {
-        printf(ROJO NEGRITA "Error de sintaxis. bg: posición del trabajo no válida\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. bg: posición del trabajo no válida\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
 
     // Si está en ejecución, error
     if (jobs_list[pos].estado == 'E')
     {
-        printf(ROJO NEGRITA "Error. bg: el trabajo ya está en ejecución\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. bg: el trabajo ya está en ejecución\n" RESET);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
     //Cambiamos el estado a ejecutándose
     jobs_list[pos].estado = 'E';
-    sprintf(mensaje, "Reanudando proceso detenido en background: PID %d, comando: %s, estado: %c\n", jobs_list[pos].pid, jobs_list[pos].comando, jobs_list[pos].estado);
-    write(1, mensaje, strlen(mensaje));
+    sprintf(mensaje, "[%d] PID %d, comando: %s, estado: %c\n", pos, jobs_list[pos].pid, jobs_list[pos].comando, jobs_list[pos].estado);
+    write(2, mensaje, strlen(mensaje));
     fflush(stdout);
     //Reanudamos el proceso 
     kill(jobs_list[pos].pid, SIGCONT);
@@ -488,20 +525,23 @@ int parse_args(char **args, char *line)
     {
         if (token[0] == '#')
         { // Si encontramos un comentario, lo ignoramos y no seguimos parseando
-            // printf("Token %d: %s\n", i, token);
-            // printf("Comentario encontrado, ignorando el resto de la línea\n");
             token = NULL;
         }
         else
         //Si no es un comentario, lo guardamos en args y pasamos al siguiente token
         {
             args[i] = token;
-            // printf("Token %d: %s\n", i, args[i]);
+            
             i++;
             token = strtok(NULL, " ");
         }
     } while (token != NULL);
     args[i] = NULL;
+    #if DEBUGN1
+        sprintf(mensaje, "Cadena de tokens: %s\nCantidad de tokens: %d\n", args);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
+    #endif
     return i;
 }
 
@@ -548,8 +588,6 @@ char *read_line(char *line)
 */
 int execute_line(char *line)
 {
-    // printf("Nombre del programa shell : %s\n", mi_shell);
-
     // Copiamos la línea para tenerla sin modificar
     char *copyLine = (char *)malloc(COMMAND_LINE_SIZE * sizeof(char));
     if (copyLine == NULL)
@@ -589,10 +627,11 @@ int execute_line(char *line)
             signal(SIGINT, SIG_IGN);
             signal(SIGTSTP, SIG_IGN);
 
-            // printf("PID del hijo: %d\n", getpid());
-            // printf("Comando en ejecución: %s\n" , copyLine);
-            sleep(0.5);
-            fflush(stdout);
+             #if DEBUGN3
+                sprintf(mensaje, "PID del hijo: %d\nComando en ejecución: %s\n", getpid());
+                write(2,mensaje, strlen(mensaje));
+                fflush(stdout);
+            #endif
             //Si hay redirección del output
             is_output_redirection(args);
             //Ejecutamos el comando
@@ -611,10 +650,16 @@ int execute_line(char *line)
             // Si es foreground, esperamos a que termine
             if (foreground == 0)
             {
-                // printf("Ejecutando en foreground\n");
-                // printf("PID del padre: %d\n", getpid());
-                sleep(0.5);
-                fflush(stdout);
+                #if DEBUGN5
+                    sprintf(mensaje, "Ejecutando en foreground\n", getpid());
+                    write(2,mensaje, strlen(mensaje));
+                    fflush(stdout);
+                #endif
+                #if DEBUGN3
+                    sprintf(mensaje, "PID del padre: %d\n", getpid());
+                    write(2,mensaje, strlen(mensaje));
+                    fflush(stdout);
+                #endif
                 jobs_list[0].pid = exFork;
                 jobs_list[0].estado = 'E';
                 strcpy(jobs_list[0].comando, copyLine);
@@ -627,10 +672,16 @@ int execute_line(char *line)
             // Si es background, añadimos el trabajo a la lista de trabajos
             else
             {
-                // printf("Ejecutando en background\n");
-                // printf("PID del padre: %d\n", getpid());
-                sleep(0.5);
-                fflush(stdout);
+                #if DEBUGN5
+                    sprintf(mensaje, "Ejecutando en background\n", getpid());
+                    write(2,mensaje, strlen(mensaje));
+                    fflush(stdout);
+                #endif
+                #if DEBUGN3
+                    sprintf(mensaje, "PID del padre: %d\n", getpid());
+                    write(2,mensaje, strlen(mensaje));
+                    fflush(stdout);
+                #endif
                 jobs_list_add(exFork, copyLine, 'E');
             }
         }
@@ -659,21 +710,23 @@ void reaper(int signum)
 
             if (WIFEXITED(status))
             {
+                #if DEBUGN3||DEBUGN4
                 sprintf(mensaje,
                         "Proceso en foreground (PID: %d, comando: %s, estado: %c) ha terminado con el estado: %d\n",
                         jobs_list[0].pid, jobs_list[0].comando, jobs_list[0].estado, WEXITSTATUS(status));
-
-                write(1, mensaje, strlen(mensaje));
+                write(2, mensaje, strlen(mensaje));
                 fflush(stdout);
+                #endif
             }
-            else if (WIFSIGNALED(status))
+            else if (WIFSIGNALED(status) && DEBUGN4)
             {
+                #if DEBUGN4||DEBUGN5||DEBUGN6
                 sprintf(mensaje,
                         "\nProceso en foreground (PID: %d, comando: %s, estado: %c) ha recibido la señal: %d\n",
                         jobs_list[0].pid, jobs_list[0].comando, jobs_list[0].estado, WTERMSIG(status));
-
-                write(1, mensaje, strlen(mensaje));
+                write(2, mensaje, strlen(mensaje));
                 fflush(stdout);
+                #endif
             }
 
             // Limpiamos el foreground
@@ -704,12 +757,11 @@ void reaper(int signum)
                 //Si ha recibido una señal
                 else if (WIFSIGNALED(status))
                 {
-                    jobs_list[index].estado = 'F';
                     sprintf(mensaje,
                             "\nProceso en background (PID: %d, comando: %s, estado: %c) ha recibido la señal: %d\n",
                             jobs_list[index].pid, jobs_list[index].comando, jobs_list[index].estado, WTERMSIG(status));
 
-                    write(1, mensaje, strlen(mensaje));
+                    write(2, mensaje, strlen(mensaje));
                     fflush(stdout);
                 }
                 //Lo eliminamos de la lista de trabajos
@@ -834,7 +886,9 @@ int jobs_list_add(pid_t pid, char *comando, char estado)
     // Comprobamos que no se haya alcanzado el máximo de trabajos
     if (n_jobs + 1 >= N_JOBS)
     {
-        printf(ROJO NEGRITA "Error. jobs_list_add: número máximo de trabajos alcanzado\n" RESET);
+        sprintf(mensaje, ROJO NEGRITA "Error. jobs_list_add: número máximo de trabajos alcanzado\n" RESET);
+        write(2, mensaje, strlen(mensaje));
+        fflush(stdout);
         return -1;
     }
     n_jobs++;
@@ -843,6 +897,7 @@ int jobs_list_add(pid_t pid, char *comando, char estado)
     strcpy(jobs_list[n_jobs].comando, comando);
     jobs_list[n_jobs].estado = estado;
     printf("[%d] PID %d, comando: %s, estado: %c\n", n_jobs, pid, comando, estado);
+    fflsuh(stdout);
     return n_jobs;
 }
 
@@ -963,7 +1018,7 @@ int is_output_redirection(char **args)
 void main(int argc, char *argv[])
 {
     char line[COMMAND_LINE_SIZE];
-
+    
     // Asignamos a las señales a sus manejadores correspondientes
     signal(SIGINT, ctrlc);
     signal(SIGCHLD, reaper);
@@ -979,7 +1034,11 @@ void main(int argc, char *argv[])
 
     // Cogemos el string para ejecutar el shell a partir de argv[0]
     strcpy(mi_shell, argv[0]);
-
+    #if DEBUGN3
+        sprintf("Nombre del programa shell : %s\n", mi_shell);
+        write(2,mensaje, strlen(mensaje));
+        fflush(stdout);
+    #endif
     // Realizamos un bucle infinito para el shell
     while (1)
     {
