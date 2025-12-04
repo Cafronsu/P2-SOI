@@ -104,7 +104,7 @@ int internal_cd(char **args)
                 return -1;
             }
             #if DEBUGN2
-                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                sprintf(mensaje, "Directorio cambiado a %s\n", getcwd(NULL, 0));
                 write(2,mensaje, strlen(mensaje));
                 fflush(stdout);
             #endif
@@ -130,7 +130,7 @@ int internal_cd(char **args)
                 return -1;
             }
             #if DEBUGN2
-                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                sprintf(mensaje, "Directorio cambiado a %s\n", getcwd(NULL, 0));
                 write(2,mensaje, strlen(mensaje));
                 fflush(stdout);
             #endif
@@ -145,7 +145,7 @@ int internal_cd(char **args)
                 return -1;
             }
             #if DEBUGN2
-                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                sprintf(mensaje, "Directorio cambiado a %s\n", getcwd(NULL, 0));
                 write(2,mensaje, strlen(mensaje));
                 fflush(stdout);
             #endif
@@ -187,7 +187,7 @@ int internal_cd(char **args)
         free(concat);
         free(temp);
         #if DEBUGN2
-                sprintf("Directorio cambiado a %s\n", getcwd(NULL, 0));
+                sprintf(mensaje, "Directorio cambiado a %s\n", getcwd(NULL, 0));
                 write(2,mensaje, strlen(mensaje));
                 fflush(stdout);
         #endif
@@ -225,10 +225,11 @@ int internal_export(char **args)
     char *value = strtok(NULL, "=");
 
     #if DEBUGN2
-        sprintf(mensaje, "Comprobación antes de export: %s\nValor: %s\nVariable: %s\n", getenv(var));
+        sprintf(mensaje, "Comprobación antes de export: %s\nValor: %s\nVariable: %s\n", getenv(var), value, var);
         write(2,mensaje, strlen(mensaje));
         fflush(stdout);
     #endif
+    
     if (value == NULL)
     {
         sprintf(mensaje, ROJO NEGRITA "Error de sintaxis. export: el valor es nulo\n" RESET);
@@ -538,9 +539,15 @@ int parse_args(char **args, char *line)
     } while (token != NULL);
     args[i] = NULL;
     #if DEBUGN1
-        sprintf(mensaje, "Cadena de tokens: %s\nCantidad de tokens: %d\n", args);
+        for(int j = 0; j<i; j++){
+            sprintf(mensaje, "Token [%d]: %s\n", j, args[j]);
+            write(2,mensaje, strlen(mensaje));
+            fflush(stdout);
+        }
+        sprintf(mensaje, "Cantidad de tokens: %d\n", i);
         write(2,mensaje, strlen(mensaje));
         fflush(stdout);
+        
     #endif
     return i;
 }
@@ -548,7 +555,7 @@ int parse_args(char **args, char *line)
 /*
     Función para leer una línea de comandos
     Parametros: line (char*) - line donde se guardará la línea leída
-    Retorno: línea leída (char*)
+    Retorno: línea leída (char*), "" en cualquier otro caso
 */
 char *read_line(char *line)
 {
@@ -577,7 +584,9 @@ char *read_line(char *line)
         if (feof(stdin))
         {
             internal_exit(0);
+            return "";
         }
+        return "";
     }
 }
 
@@ -628,7 +637,7 @@ int execute_line(char *line)
             signal(SIGTSTP, SIG_IGN);
 
              #if DEBUGN3
-                sprintf(mensaje, "PID del hijo: %d\nComando en ejecución: %s\n", getpid());
+                sprintf(mensaje, "PID del hijo: %d\nComando en ejecución: %s\n", getpid(), copyLine);
                 write(2,mensaje, strlen(mensaje));
                 fflush(stdout);
             #endif
@@ -651,7 +660,7 @@ int execute_line(char *line)
             if (foreground == 0)
             {
                 #if DEBUGN5
-                    sprintf(mensaje, "Ejecutando en foreground\n", getpid());
+                    sprintf(mensaje, "Ejecutando en foreground\n");
                     write(2,mensaje, strlen(mensaje));
                     fflush(stdout);
                 #endif
@@ -673,7 +682,7 @@ int execute_line(char *line)
             else
             {
                 #if DEBUGN5
-                    sprintf(mensaje, "Ejecutando en background\n", getpid());
+                    sprintf(mensaje, "Ejecutando en background\n");
                     write(2,mensaje, strlen(mensaje));
                     fflush(stdout);
                 #endif
@@ -897,7 +906,7 @@ int jobs_list_add(pid_t pid, char *comando, char estado)
     strcpy(jobs_list[n_jobs].comando, comando);
     jobs_list[n_jobs].estado = estado;
     printf("[%d] PID %d, comando: %s, estado: %c\n", n_jobs, pid, comando, estado);
-    fflsuh(stdout);
+    fflush(stdout);
     return n_jobs;
 }
 
@@ -1015,7 +1024,7 @@ int is_output_redirection(char **args)
     Parametros: argc, argv
     Retorno: ninguno
 */
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     char line[COMMAND_LINE_SIZE];
     
@@ -1035,7 +1044,7 @@ void main(int argc, char *argv[])
     // Cogemos el string para ejecutar el shell a partir de argv[0]
     strcpy(mi_shell, argv[0]);
     #if DEBUGN3
-        sprintf("Nombre del programa shell : %s\n", mi_shell);
+        sprintf(mensaje, "Nombre del programa shell : %s\n", mi_shell);
         write(2,mensaje, strlen(mensaje));
         fflush(stdout);
     #endif
