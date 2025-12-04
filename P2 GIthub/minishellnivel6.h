@@ -33,13 +33,13 @@
 #define CIAN "\033[36m"
 #define BLANCO "\033[37m"
 
-
-int DEBUGN1=0;
-int DEBUGN2=0;
-int DEBUGN3=0;
-int DEBUGN4=0;
-int DEBUGN5=0;
-int DEBUGN6=0;
+//Constantes de debug
+#define DEBUGN1 0;
+#define DEBUGN2 0;
+#define DEBUGN3 0;
+#define DEBUGN4 0;
+#define DEBUGN5 0;
+#define DEBUGN6 0;
 
 struct info_job
 {
